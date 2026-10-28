@@ -1,0 +1,54 @@
+name: Datos diarios del screener
+
+# Horas en UTC. El script descarta la vela del día hasta las 16:20 de Nueva York
+# y no hace nada si la sesión ya está completa, así que repetir es inocuo.
+on:
+  schedule:
+    - cron: '25 20 * * 1-5'
+    - cron: '50 20 * * 1-5'
+    - cron: '20 21 * * 1-5'
+    - cron: '40 21 * * 1-5'
+    - cron: '10 22 * * 1-5'
+    - cron: '0 2 * * 2-6'
+    - cron: '30 11 * * 2-6'
+  workflow_dispatch:
+    inputs:
+      forzar:
+        description: 'Volver a descargar aunque la sesión ya esté completa (1 = sí)'
+        required: false
+        default: '0'
+  push:
+    branches: [main]
+    paths: ['scripts/**', 'universo.json', '.github/workflows/**']
+
+permissions:
+  contents: write
+
+concurrency:
+  group: datos
+  cancel-in-progress: false
+
+jobs:
+  descargar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Instalar dependencias
+        run: pip install --upgrade yfinance pandas requests
+      - name: Descargar y calcular
+        env:
+          FORZAR: ${{ github.event.inputs.forzar || '0' }}
+        run: python scripts/descargar.py
+      - name: Guardar en el repositorio
+        run: |
+          git config user.name "screener-bot"
+          git config user.email "screener-bot@users.noreply.github.com"
+          git add datos
+          if git diff --cached --quiet; then echo "Sin cambios"; exit 0; fi
+          git commit -m "$(cat datos/mensaje.txt)"
+          git pull --rebase
+          git push
