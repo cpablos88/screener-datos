@@ -202,6 +202,7 @@ def analistas(t, sesion):
 def main():
     previo = json.load(open(OUT, encoding='utf-8')) if os.path.exists(OUT) else {}
     acc, etf = UNIV['acciones'], UNIV['etf']
+    cartera = [t for t in UNIV.get('cartera', []) if t not in acc]
 
     spy = limpiar(yahoo_lote(['SPY']).get('SPY') or nasdaq('SPY', 'etf') or [])
     if not spy:
@@ -212,12 +213,14 @@ def main():
 
     cob = previo.get('cobertura', {})
     completo = (previo.get('sesion') == sesion and not cob.get('faltan') and not cob.get('etf_faltan')
-                and previo.get('analistas_sesion') == sesion)
+                and previo.get('analistas_sesion') == sesion
+                and set(cob.get('cartera') or []) == set(t for t in UNIV.get('cartera', []) if t not in acc)
+                and not cob.get('cartera_faltan'))
     if completo and os.environ.get('FORZAR') != '1':
         log('La sesión', sesion, 'ya está completa. Nada que hacer.')
         return
 
-    todos = acc + etf
+    todos = acc + cartera + etf
     yb = yahoo_lote(todos)
     barras, fuente = {}, {}
     for t in todos:
@@ -236,7 +239,7 @@ def main():
     hacer_an = previo.get('analistas_sesion') != sesion
     an_ok = 0
     S = {}
-    for t in acc:
+    for t in acc + cartera:
         x = metricas(barras[t]) if t in barras else {'fecha': None}
         x['fuente'] = fuente.get(t)
         an = {k: prevS.get(t, {}).get(k) for k in ('pt', 'pt_lo', 'pt_hi', 'nan', 'cons', 'beta', 'earn', 'votos', 'an_fecha')}
@@ -267,6 +270,7 @@ def main():
             E[t] = dict(fecha=None)
 
     faltan = [t for t in acc if S[t].get('fecha') != sesion]
+    cfaltan = [t for t in cartera if S[t].get('fecha') != sesion]
     efaltan = [t for t in etf if E[t].get('fecha') != sesion]
     an_hecho = (not hacer_an) or an_ok >= 0.9 * len(acc)
     out = dict(
@@ -277,7 +281,7 @@ def main():
         fuentes=dict(precios='Yahoo Finance (yfinance); respaldo Nasdaq', analistas='Yahoo Finance'),
         cobertura=dict(acciones_ok=len(acc) - len(faltan), acciones_total=len(acc), faltan=faltan,
                        etf_ok=len(etf) - len(efaltan), etf_total=len(etf), etf_faltan=efaltan,
-                       analistas_ok=an_ok if hacer_an else None),
+                       analistas_ok=an_ok if hacer_an else None, cartera=cartera, cartera_faltan=cfaltan),
         excluidas=UNIV.get('excluidas', {}),
         etf=E,
         S=S,

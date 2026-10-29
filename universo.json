@@ -215,5 +215,16 @@
  ],
  "excluidas": {
   "WBD": "Deslistada el 6-oct-2026 (adquirida)"
- }
+ },
+ "cartera": [
+  "GOOG",
+  "RBRK",
+  "ASST",
+  "TMDX",
+  "IREN",
+  "AAOI",
+  "CRDO",
+  "VST"
+ ],
+ "nota_cartera": "Valores de la cartera de Carlos fuera del universo: se descargan para gestionar las posiciones, pero no entran en el screener ni en la amplitud."
 }
