@@ -47,6 +47,8 @@ jobs:
     timeout-minutes: 75
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: main   # siempre la última versión, también si la ejecución esperó en cola
 
       - uses: actions/setup-python@v5
         with:
@@ -88,5 +90,5 @@ jobs:
           git add datos/buffett
           if git diff --cached --quiet; then echo "Sin cambios"; exit 0; fi
           git commit -m "$(cat datos/buffett/mensaje.txt)"
-          for i in 1 2 3; do git pull --rebase && git push && exit 0; sleep 15; done
+          for i in 1 2 3; do git pull --rebase -X theirs && git push && exit 0; git rebase --abort 2>/dev/null; sleep 15; done
           exit 1

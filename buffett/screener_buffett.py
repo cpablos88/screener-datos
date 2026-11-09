@@ -604,6 +604,10 @@ def compute_company(meta, panel, mkt, ust10, monthly_px, splits_by_year, cfg):
         if col not in p.columns:
             p[col] = np.nan
     p = p[p["net_income"].notna()].sort_index().tail(10)
+    # Ejercicios que no cierran en diciembre: el balance del último año aún no existe en la SEC
+    # (se lee al 31-dic). Se usa el del año anterior, como máximo un año.
+    inst = list(INSTANT_TAGS)
+    p[inst] = p[inst].ffill(limit=1)
     price = mkt.get("price")
     row = {"Ticker": meta["ticker"], "Empresa": meta["empresa"], "Sector": meta["sector"],
            "Subsector": meta["subsector"], "Precio": _rnd(price), "Modo": "Financiero" if fin else "General",
