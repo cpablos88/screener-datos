@@ -28,7 +28,7 @@ import os as _os
 
 CONFIG = {
     # --- Identificación para la SEC (obligatorio). En GitHub: secreto SEC_USER_AGENT ---
-    "SEC_USER_AGENT": _os.environ.get("SEC_USER_AGENT", "Nombre Apellido tu_email@ejemplo.com"),
+    "SEC_USER_AGENT": (_os.environ.get("SEC_USER_AGENT") or "").strip() or "Nombre Apellido tu_email@ejemplo.com",
 
     # --- Carpetas ---
     "OUTPUT_DIR": _os.environ.get("BUFFETT_OUTPUT_DIR", "/content/drive/MyDrive/ScreenerBuffett"),
@@ -206,6 +206,8 @@ class SecFrames:
         self.s = requests.Session()
         self.s.headers.update({"User-Agent": cfg["SEC_USER_AGENT"], "Accept-Encoding": "gzip, deflate"})
         self.calls = 0
+        self.ok = 0
+        self.forbidden = 0
 
     def get(self, tag, unit, period, year):
         fn = os.path.join(self.dir, f"{tag}_{unit}_{period}.json")
@@ -220,7 +222,15 @@ class SecFrames:
                 r = self.s.get(url, timeout=60)
                 self.calls += 1
                 time.sleep(0.12)  # límite SEC: 10 peticiones/s
+                if r.status_code == 403:
+                    self.forbidden += 1
+                    if self.ok == 0 and self.forbidden >= 3:
+                        raise RuntimeError("La SEC rechaza las descargas (403). Revisa el secreto SEC_USER_AGENT: "
+                                           "debe ser «Nombre Apellido email» con un email real.")
+                    time.sleep(2)
+                    continue
                 if r.status_code in (200, 404):
+                    self.ok += 1
                     data = {"data": [{"cik": d["cik"], "val": d["val"]} for d in r.json().get("data", [])]} \
                         if r.status_code == 200 else {"data": []}
                     with open(fn, "w") as f:
@@ -1142,7 +1152,8 @@ def prewarm(cfg):
 
 
 def run(cfg=CONFIG):
-    if "tu_email@ejemplo.com" in cfg["SEC_USER_AGENT"]:
+    ua = cfg["SEC_USER_AGENT"]
+    if "tu_email@ejemplo.com" in ua or "@" not in ua:
         raise ValueError("Falta SEC_USER_AGENT (nombre y email). En GitHub: secreto del repositorio; en Colab: CONFIG.")
     os.makedirs(cfg["OUTPUT_DIR"], exist_ok=True)
     if cfg["PREWARM"]:
