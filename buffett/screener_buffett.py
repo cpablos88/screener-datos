@@ -46,7 +46,7 @@ CONFIG = {
     "DISCOUNT_RATE": 0.10,            # suelo de la tasa de descuento
     "DISCOUNT_SPREAD": 0.05,          # tasa = máx(DISCOUNT_RATE, bono 10a + DISCOUNT_SPREAD)
     "TERMINAL_GROWTH": 0.03,          # crecimiento perpetuo a partir del año 10
-    "MAX_GROWTH": 0.15,               # tope al crecimiento usado en los años 1–5
+    "MAX_GROWTH": 0.12,               # tope al crecimiento usado en los años 1–5 (prudencia Buffett)
     "PE_TERMINAL_CAP": 20.0,          # PER máximo de salida en el método de TAE a 10 años
     "PE_TERMINAL_FLOOR": 8.0,
     "TARGET_RETURN": 0.15,            # rentabilidad para "Precio para 15%"
