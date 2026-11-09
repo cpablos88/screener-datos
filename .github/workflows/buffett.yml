@@ -1,0 +1,92 @@
+name: Screener Buffett
+
+# Horas en UTC. Objetivo: datos listos antes de las 23:15 de Madrid, cuando la tarea
+# programada de Claude escribe el informe. Va separado del workflow de datos del
+# screener de entradas y salidas (que corre a las :25/:50/:20/:40/:10) para no
+# pedir datos a Yahoo a la vez.
+#
+#  17:05          precarga: SEC, histórico mensual y analistas (lo lento, 15–25 min)
+#  20:35 / 21:35  cálculo tras el cierre (verano / invierno): solo precios, 3–5 min.
+#                 El script descarta la vela del día hasta las 16:20 de Nueva York,
+#                 así que la ejecución que llega antes del cierre no hace nada.
+#  21:55          reintento antes de las 23:15 de Madrid
+#  02:30          último reintento (por si todo falló)
+#
+# Si la sesión ya está calculada y buffett/revisiones.csv no ha cambiado, no hace nada.
+on:
+  schedule:
+    - cron: '5 17 * * 1-5'
+    - cron: '35 20 * * 1-5'
+    - cron: '35 21 * * 1-5'
+    - cron: '55 21 * * 1-5'
+    - cron: '30 2 * * 2-6'
+  workflow_dispatch:
+    inputs:
+      forzar:
+        description: 'Recalcular aunque la sesión ya esté hecha (1 = sí)'
+        required: false
+        default: '0'
+      precarga:
+        description: 'Solo precargar SEC, histórico y analistas (1 = sí)'
+        required: false
+        default: '0'
+  push:
+    branches: [main]
+    paths: ['buffett/*.py', 'buffett/revisiones.csv', '.github/workflows/buffett.yml']
+
+permissions:
+  contents: write
+
+concurrency:
+  group: buffett
+  cancel-in-progress: false
+
+jobs:
+  screener:
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Restaurar caché (SEC, histórico, analistas)
+        uses: actions/cache/restore@v4
+        with:
+          path: .cache_buffett
+          key: buffett-${{ github.run_id }}
+          restore-keys: buffett-
+
+      - name: Instalar dependencias
+        run: pip install --upgrade yfinance pandas requests lxml
+
+      - name: Calcular el Screener Buffett
+        id: calc
+        env:
+          SEC_USER_AGENT: ${{ secrets.SEC_USER_AGENT }}   # «Nombre Apellido email»: secreto del repositorio
+          BUFFETT_OUTPUT_DIR: datos/buffett
+          BUFFETT_CACHE_DIR: .cache_buffett
+          BUFFETT_REVIEWS: buffett/revisiones.csv
+          BUFFETT_XLSX: '0'
+          BUFFETT_PREWARM: ${{ (github.event.schedule == '5 17 * * 1-5' || github.event.inputs.precarga == '1') && '1' || '0' }}
+          FORZAR: ${{ github.event.inputs.forzar || '0' }}
+        run: python buffett/screener_buffett.py
+
+      - name: Guardar caché
+        if: steps.calc.outputs.work == '1'
+        uses: actions/cache/save@v4
+        with:
+          path: .cache_buffett
+          key: buffett-${{ github.run_id }}
+
+      - name: Guardar en el repositorio
+        run: |
+          git config user.name "screener-bot"
+          git config user.email "screener-bot@users.noreply.github.com"
+          git add datos/buffett
+          if git diff --cached --quiet; then echo "Sin cambios"; exit 0; fi
+          git commit -m "$(cat datos/buffett/mensaje.txt)"
+          for i in 1 2 3; do git pull --rebase && git push && exit 0; sleep 15; done
+          exit 1
