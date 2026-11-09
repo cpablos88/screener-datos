@@ -1,6 +1,6 @@
 name: Screener Buffett
 
-# Horas en UTC. Objetivo: datos listos antes de las 23:15 de Madrid, cuando la tarea
+# Horas en UTC. Objetivo: datos listos antes de las 23:30 de Madrid, cuando la tarea
 # programada de Claude escribe el informe. Va separado del workflow de datos del
 # screener de entradas y salidas (que corre a las :25/:50/:20/:40/:10) para no
 # pedir datos a Yahoo a la vez.
@@ -9,7 +9,7 @@ name: Screener Buffett
 #  20:35 / 21:35  cálculo tras el cierre (verano / invierno): solo precios, 3–5 min.
 #                 El script descarta la vela del día hasta las 16:20 de Nueva York,
 #                 así que la ejecución que llega antes del cierre no hace nada.
-#  21:55          reintento antes de las 23:15 de Madrid
+#  21:55          reintento antes de las 23:30 de Madrid
 #  02:30          último reintento (por si todo falló)
 #
 # Si la sesión ya está calculada y buffett/revisiones.csv no ha cambiado, no hace nada.
