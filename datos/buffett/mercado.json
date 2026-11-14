@@ -1,6 +1,6 @@
 {
  "Fecha datos": "2026-11-13",
- "Generado (UTC)": "2026-11-13T21:20:50+00:00",
+ "Generado (UTC)": "2026-11-14T00:10:08+00:00",
  "Bono 10a %": 5.15,
  "Tasa descuento %": 10.15,
  "Empresas universo": 503,
@@ -8,13 +8,13 @@
  "Con valor intrínseco": 454,
  "Mediana Precio/VI": 1.57,
  "% cotizando bajo VI": 25.1,
- "Nº COMPRAR": 12,
- "Nº VIGILAR": 39,
+ "Nº COMPRAR": 11,
+ "Nº VIGILAR": 40,
  "Nº CARO": 84,
  "Nº SOBREVALORADA": 138,
  "Nº REVISAR": 8,
  "Nº DESCARTAR": 222,
- "Revisiones aplicadas": 0,
+ "Revisiones aplicadas": 10,
  "Revisiones caducadas": 0,
- "Hash revisiones": "8f001537f983"
+ "Hash revisiones": "b2ff5622663e"
 }
