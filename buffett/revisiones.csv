@@ -1,1 +1,11 @@
 ticker,fecha,circulo,foso,direccion,ajuste,motivo
+PYPL,2026-11-13,Dentro,Estrecho,Fiable,-5,Checkout de marca estancado (+1-2 % cuatro trimestres seguidos): efecto red en duda; recompras de 1.500 M$ por trimestre por debajo del VI; SBC alto
+NVR,2026-11-13,Dentro,Estrecho,Fiable,-3,Modelo de opciones sobre suelo y recompras constantes con caja neta; T3 con margen bruto -270 pb y pedidos -7 %: OE de 3 años cerca del pico del ciclo; bonos de 900 M$ no recogidos en XBRL
+ADBE,2026-11-13,Dentro,Estrecho,Fiable,-6,Estándar en diseño y PDF con costes de cambio; la IA generativa y los paquetes más baratos ponen en duda la durabilidad del foso; SBC alto sobre FCF
+PGR,2026-11-13,Dentro,Amplio,Fiable,1,Ventaja de costes y de datos de tarificación en autos; información mensual franca; ratio combinado cerca de 89 frente al objetivo de 96: margen técnico en pico de ciclo
+ALL,2026-11-13,Dentro,Estrecho,Fiable,-3,Marca y escala en seguros personales sin ventaja de costes clara; pérdidas en 2 de 10 años y alta exposición a catástrofes (1.650 M$ en T3)
+GEN,2026-11-13,Dentro,Estrecho,Dudosa,-6,Suscripciones de ciberseguridad con renovación automática; deuda de unos 11 años de beneficio por adquisiciones; BPA ajustado muy por encima del contable
+ZTS,2026-11-13,Dentro,Estrecho,Fiable,-3,Líder en salud animal con marcas y red veterinaria; mascotas en EE. UU. -8 % en T3 por genéricos y competencia en dermatología; ventas totales planas
+CB,2026-11-13,Dentro,Amplio,Fiable,3,Suscripción disciplinada y distribución global; ratio combinado cerca de 84 y recompras de 1.180 M$ en T3; precios comerciales en Norteamérica a la baja
+TROW,2026-11-13,Dentro,Ninguno,Fiable,-8,Salidas netas de 28.300 M$ en T3 y comisión media a la baja cada trimestre: erosión estructural de la gestión activa frente a la pasiva
+LOW,2026-11-13,Dentro,Amplio,Fiable,-2,Duopolio con escala y red de tiendas; apalancamiento de 3 veces EBITDAR tras comprar FBM con recompras pausadas hasta 2027; exposición a vivienda
